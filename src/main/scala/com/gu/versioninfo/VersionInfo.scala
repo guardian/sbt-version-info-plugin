@@ -31,7 +31,7 @@ object VersionInfo extends Plugin {
     val versionFileContents = versionInfo.map{ case (x, y) => x + ": " + y }.toList.sorted
 
     val versionFile = outDir / "version.txt"
-    s.log.info("Writing to " + versionFile + ":\n   " + versionFileContents.mkString("\n   "))
+    s.log.debug("Writing to " + versionFile + ":\n   " + versionFileContents.mkString("\n   "))
 
     IO.write(versionFile, versionFileContents mkString ("\n") )
 

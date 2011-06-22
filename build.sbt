@@ -3,10 +3,12 @@ name := "sbt-version-info-plugin"
 
 organization := "com.gu"
 
-version := "2.0-SNAPSHOT"
+version := "2.1-SNAPSHOT"
 
 sbtPlugin := true
 
+// don't bother publishing javadoc
+publishArtifact in (Compile, packageDoc) := false
 
 publishTo <<= (version) { version: String =>
     val publishType = if (version.endsWith("SNAPSHOT")) "snapshots" else "releases"
