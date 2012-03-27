@@ -18,7 +18,7 @@ object VersionInfo extends Plugin {
     branch := "trunk",
     buildNumber := System.getProperty("build.number", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
-    versionTxtFile :=  file(resourceManaged) / "version.txt".
+    versionTxtFile <<=  resourceManaged(_.getCanonicalFile / "version.txt") ,
     resourceGenerators in Compile <+= (versionTxtFile, branch, buildNumber, vcsNumber, streams) map buildFile
   )
 
