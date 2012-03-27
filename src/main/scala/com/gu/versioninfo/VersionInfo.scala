@@ -11,16 +11,18 @@ object VersionInfo extends Plugin {
   val branch = SettingKey[String]("version-branch")
   val buildNumber = SettingKey[String]("version-build-number")
   val vcsNumber = SettingKey[String]("version-vcs-number")
+  val versionTxtFile = SettingKey[File]("version-txt-file", "Location to generate the version.txt file in")
 
 
   override val settings = Seq(
     branch := "trunk",
     buildNumber := System.getProperty("build.number", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
-    resourceGenerators in Compile <+= (resourceManaged, branch, buildNumber, vcsNumber, streams) map buildFile
+    versionTxtFile :=  file(resourceManaged) / "version.txt".
+    resourceGenerators in Compile <+= (versionTxtFile, branch, buildNumber, vcsNumber, streams) map buildFile
   )
 
-  def buildFile(outDir: File, branch: String, buildNum: String, vcsNum: String, s: TaskStreams) = {
+  def buildFile(versionFile: File, branch: String, buildNum: String, vcsNum: String, s: TaskStreams) = {
     val versionInfo = Map(
       "Revision" -> vcsNum,
       "Build" -> buildNum,
@@ -30,7 +32,6 @@ object VersionInfo extends Plugin {
 
     val versionFileContents = versionInfo.map{ case (x, y) => x + ": " + y }.toList.sorted
 
-    val versionFile = outDir / "version.txt"
     s.log.debug("Writing to " + versionFile + ":\n   " + versionFileContents.mkString("\n   "))
 
     IO.write(versionFile, versionFileContents mkString ("\n") )
