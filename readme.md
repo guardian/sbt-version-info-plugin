@@ -1,7 +1,7 @@
 sbt-version-info-plugin
 =======================
 
-This sbt 0.10 plugin generates a version.txt file in the root of your classpath.
+This sbt plugin generates a version.txt file in the root of your classpath.
 This is typically used by the
 [guardian-management](https://github.com/guardian/guardian-management) manifest reporter,
 which displays the content of this file.
@@ -21,7 +21,7 @@ To use:
             )
         }
 
-4. The VersionInfo trait relies on a couple of system properties to obtain the build number etc from TeamCity.
+3. The VersionInfo trait relies on a couple of system properties to obtain the build number etc from TeamCity.
    To pass these in you want a sbt start script that looks a bit like this (which by convention we call sbt-tc):
 
        #!/bin/bash
@@ -31,11 +31,3 @@ To use:
         -Dbuild.number="$BUILD_NUMBER" \
         -Dbuild.vcs.number="$BUILD_VCS_NUMBER" \
         -jar sbt-launch-0.10.0.jar "$@"
-
-
-
-    
-
-
-
-
