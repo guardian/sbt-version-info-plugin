@@ -11,13 +11,12 @@ object VersionInfo extends Plugin {
   val branch = SettingKey[String]("version-branch")
   val buildNumber = SettingKey[String]("version-build-number")
   val vcsNumber = SettingKey[String]("version-vcs-number")
-
-
+  
   override val settings = Seq(
     branch := "trunk",
     buildNumber := System.getProperty("build.number", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
-    resourceGenerators in Compile <+= (resourceManaged, branch, buildNumber, vcsNumber, streams) map buildFile
+    resourceGenerators in Compile <+= (resourceManaged in Compile, branch, buildNumber, vcsNumber, streams) map buildFile
   )
 
   def buildFile(outDir: File, branch: String, buildNum: String, vcsNum: String, s: TaskStreams) = {
