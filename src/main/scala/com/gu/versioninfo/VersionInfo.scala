@@ -11,7 +11,7 @@ object VersionInfo extends Plugin {
   val branch = SettingKey[String]("version-branch")
   val buildNumber = SettingKey[String]("version-build-number")
   val vcsNumber = SettingKey[String]("version-vcs-number")
-  
+
   override val settings = Seq(
     branch := "trunk",
     buildNumber := System.getProperty("build.number", "DEV"),
@@ -27,14 +27,13 @@ object VersionInfo extends Plugin {
       "Built-By" -> System.getProperty("user.name", "<unknown>"),
       "Built-On" -> InetAddress.getLocalHost.getHostName)
 
-    val versionFileContents = versionInfo.map{ case (x, y) => x + ": " + y }.toList.sorted
+    val versionFileContents = (versionInfo map { case (x, y) => x + ": " + y }).toList.sorted
 
     val versionFile = outDir / "version.txt"
     s.log.debug("Writing to " + versionFile + ":\n   " + versionFileContents.mkString("\n   "))
 
-    IO.write(versionFile, versionFileContents mkString ("\n") )
+    IO.write(versionFile, versionFileContents mkString "\n")
 
     Seq(versionFile)
   }
-
 }
