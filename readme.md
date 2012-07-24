@@ -21,8 +21,9 @@ To use:
             )
         }
 
-3. The VersionInfo trait relies on a couple of system properties to obtain the build number etc from TeamCity.
-   To pass these in you want a sbt start script that looks a bit like this (which by convention we call sbt-tc):
+3. The VersionInfo trait relies on a couple of system properties to obtain the build number etc from the CI server.
+   To pass these in create an SBT start script that for Teamcity looks a bit like this (which by convention we call 
+   sbt-tc):
 
        #!/bin/bash
 
@@ -30,4 +31,6 @@ To use:
         -Dsbt.log.noformat=true \
         -Dbuild.number="$BUILD_NUMBER" \
         -Dbuild.vcs.number="$BUILD_VCS_NUMBER" \
-        -jar sbt-launch-0.10.0.jar "$@"
+        -jar sbt-launch.jar "$@"
+   
+   You can find an example for Hudson/Jenkins at https://github.com/philwills/sbt-version-info-minimal/blob/master/sbt
