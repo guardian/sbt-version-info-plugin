@@ -23,7 +23,7 @@ object VersionInfo extends Plugin {
     vcsRootBranch := System.getProperty("vcsroot.branch", "DEV"),
 
     resourceGenerators in Compile <+= (resourceManaged in Compile, branch, buildNumber, vcsNumber, streams) map buildFile,
-    resourceGenerators in Compile <+= (resourceManaged in Compile, buildNumber, vcsNumber, vcsRootUrl, vcsRootBranch, streams, name) map buildJsonFile
+    resourceGenerators in Compile <+= (resourceManaged in Compile, buildNumber, vcsNumber, vcsRootUrl, vcsRootBranch, streams, name, version) map buildJsonFile
   )
 
   def buildFile(outDir: File, branch: String, buildNum: String, vcsNum: String, s: TaskStreams) = {
@@ -45,7 +45,7 @@ object VersionInfo extends Plugin {
     Seq(versionFile)
   }
 
-  def buildJsonFile(outDir: File, buildNum: String, vcsNum: String, vcsUrl: String, vcsBranch: String, s: TaskStreams, projectName: String) = {
+  def buildJsonFile(outDir: File, buildNum: String, vcsNum: String, vcsUrl: String, vcsBranch: String, s: TaskStreams, projectName: String, version: String) = {
     case class Git(url: String, branch: String, commit: String) {
       val `type`: String = "git"
     }
@@ -57,6 +57,8 @@ object VersionInfo extends Plugin {
 
     case class Version(
       label: String,
+      version: String,
+      name: String,
       release: String,
       build: String,
       date: String,
@@ -66,7 +68,7 @@ object VersionInfo extends Plugin {
 
     val environment = Environment(None, None, None)
     val git = Git(vcsUrl, vcsBranch, vcsNum)
-    val version = Version("", "", buildNum, new Date().toString, git, None, None)
+    val version = Version("", version, projectName, "", buildNum, new Date().toString, git, None, None)
     val jsonContent = generate(version)
 
     val versionJsonFile = outDir / ("%s.version.json" format projectName)
