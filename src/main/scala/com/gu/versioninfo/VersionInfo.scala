@@ -45,7 +45,7 @@ object VersionInfo extends Plugin {
     Seq(versionFile)
   }
 
-  def buildJsonFile(outDir: File, buildNum: String, vcsNum: String, vcsUrl: String, vcsBranch: String, s: TaskStreams, projectName: String, version: String) = {
+  def buildJsonFile(outDir: File, buildNum: String, vcsNum: String, vcsUrl: String, vcsBranch: String, s: TaskStreams, projectName: String, versionName: String) = {
     case class Git(url: String, branch: String, commit: String) {
       val `type`: String = "git"
     }
@@ -68,7 +68,7 @@ object VersionInfo extends Plugin {
 
     val environment = Environment(None, None, None)
     val git = Git(vcsUrl, vcsBranch, vcsNum)
-    val version = Version("", version, projectName, "", buildNum, new Date().toString, git, None, None)
+    val version = Version("", versionName, projectName, "", buildNum, new Date().toString, git, None, None)
     val jsonContent = generate(version)
 
     val versionJsonFile = outDir / ("%s.version.json" format projectName)
