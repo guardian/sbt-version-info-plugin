@@ -10,7 +10,7 @@ To use:
 
 1. Work out what released version you want to use by looking at the tags list for this repository.
 
-2. Add the sbt-version-info-plugin to your sbt build, by creating project/plugins/project/plugins.scala that looks like:
+2. Add the sbt-version-info-plugin to your sbt build, by creating project/project/plugins.scala that looks like:
 
         import sbt._
 
