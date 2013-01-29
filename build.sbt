@@ -6,8 +6,8 @@ version := "2.3-SNAPSHOT"
 
 sbtPlugin := true
 
-resolvers += "repo.codahale.com" at "http://repo.codahale.com"
+resolvers += Classpaths.typesafeResolver
 
-libraryDependencies += "com.codahale" %% "jerkson" % "0.5.0"
+libraryDependencies += "net.liftweb" %% "lift-json" % "2.4-M4"
 
 seq(scalariformSettings: _*)

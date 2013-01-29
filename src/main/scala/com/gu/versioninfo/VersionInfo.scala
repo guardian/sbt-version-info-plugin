@@ -5,7 +5,10 @@ import java.util.Date
 import sbt._
 import Keys._
 import java.lang.System
-import com.codahale.jerkson.Json._
+import net.liftweb.json.JsonAST.render
+import net.liftweb.json.Printer.pretty
+import net.liftweb.json.Extraction.decompose
+import net.liftweb.json.DefaultFormats
 
 object VersionInfo extends Plugin {
 
@@ -61,15 +64,15 @@ object VersionInfo extends Plugin {
       name: String,
       release: String,
       build: String,
-      date: String,
+      date: Date,
       `version-control`: Git,
       description: Option[String],
       environment: Option[Environment])
 
     val environment = Environment(None, None, None)
     val git = Git(vcsUrl, vcsBranch, vcsNum)
-    val version = Version("", versionName, projectName, "", buildNum, new Date().toString, git, None, None)
-    val jsonContent = generate(version)
+    val version = Version("", versionName, projectName, "", buildNum, new Date(), git, None, None)
+    val jsonContent = pretty(render(decompose(version)(DefaultFormats)))
 
     val versionJsonFile = outDir / ("%s.version.json" format projectName)
     s.log.debug("Writing to %s:\n   %s" format (versionJsonFile, jsonContent))
