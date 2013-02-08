@@ -1,10 +1,11 @@
 package com.gu.versioninfo
 
 import java.net.InetAddress
-import java.util.Date
+import java.util.{Properties, Date}
 import sbt._
 import Keys._
 import java.lang.System
+import scala.collection.JavaConversions._
 
 object VersionInfo extends Plugin {
 
@@ -12,18 +13,24 @@ object VersionInfo extends Plugin {
     lazy val dequote = s.replace("\"", "")
   }
 
-  val branch = SettingKey[String]("version-branch")
   val buildNumber = SettingKey[String]("version-build-number")
+  val vcsBranch = SettingKey[String]("version-branch")
   val vcsNumber = SettingKey[String]("version-vcs-number")
+  val vcsUrl = SettingKey[String]("version-vcs-url")
+  val properties = SettingKey[Properties]("all-properties")
 
   override val settings = Seq(
     buildNumber := System.getProperty("build.number", "DEV"),
-    branch := System.getProperty("build.vcs.branch", "DEV"),
+    vcsBranch := System.getProperty("teamcity.build.branch", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
-    resourceGenerators in Compile <+= (resourceManaged in Compile, branch, buildNumber, vcsNumber, streams) map buildFile
+    vcsUrl := System.getProperty("vcsroot.url", ""),
+    properties := System.getProperties
+    resourceGenerators in Compile <+= (resourceManaged in Compile, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams, properties) map buildFile
   )
 
-  def buildFile(outDir: File, branch: String, buildNum: String, vcsNum: String, s: TaskStreams) = {
+  def buildFile(outDir: File, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams, props: Properties) = {
+    s.log.info("Known properties: %s" format props.toMap.toString())
+
     val versionInfo = Map(
       "Revision" -> vcsNum.dequote.trim,
       "Branch" -> branch.dequote.trim,
