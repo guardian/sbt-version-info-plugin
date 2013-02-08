@@ -6,6 +6,7 @@ import sbt._
 import Keys._
 import java.lang.System
 import scala.collection.JavaConversions._
+import java.io.FileInputStream
 
 object VersionInfo extends Plugin {
 
@@ -28,19 +29,18 @@ object VersionInfo extends Plugin {
   )
 
   def buildFile(outDir: File, name: String, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams) = {
-    val propertiesList = List("build.number",
-      "teamcity.build.branch",
-      "build.vcs.number",
-      "vcsroot.url",
-      "teamcity.version",
-      "teamcity.projectName",
-      "teamcity.buildConfName")
-
-    val propertiesMap = propertiesList.map{propName =>
-      ("Property-%s" format propName) -> System.getProperty(propName, "<%s not set>" format propName)
+    val tcProps = try {
+      val tcPropFile = System.getProperty("build.properties.file")
+      val tcProperties = new Properties()
+      tcProperties.load(new FileInputStream(new File(tcPropFile)))
+      tcProperties.toMap
+    } catch {
+      case e:Exception =>
+        s.log.warn("TeamCity properties file not found - not in TeamCity?")
+        Map.empty
     }
 
-    val versionInfo = propertiesMap ++ Map(
+    val versionInfo = tcProps ++ Map(
       "Revision" -> vcsNum.dequote.trim,
       "Branch" -> branch.dequote.trim,
       "Build" -> buildNum.dequote.trim,
