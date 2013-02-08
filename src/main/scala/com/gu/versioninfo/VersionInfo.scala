@@ -37,7 +37,7 @@ object VersionInfo extends Plugin {
       "teamcity.buildConfName")
 
     val propertiesMap = propertiesList.map{propName =>
-      propName -> System.getProperty("Property %s" format propName, "<%s not set>" format propName)
+      "Property-%s" format propName -> System.getProperty(propName, "<%s not set>" format propName)
     }
 
     val versionInfo = propertiesMap ++ Map(
