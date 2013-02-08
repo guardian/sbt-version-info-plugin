@@ -17,21 +17,30 @@ object VersionInfo extends Plugin {
   val vcsBranch = SettingKey[String]("version-branch")
   val vcsNumber = SettingKey[String]("version-vcs-number")
   val vcsUrl = SettingKey[String]("version-vcs-url")
-  val properties = SettingKey[Properties]("all-properties")
 
   override val settings = Seq(
     buildNumber := System.getProperty("build.number", "DEV"),
     vcsBranch := System.getProperty("teamcity.build.branch", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
     vcsUrl := System.getProperty("vcsroot.url", ""),
-    properties := System.getProperties,
-    resourceGenerators in Compile <+= (resourceManaged in Compile, name, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams, properties) map buildFile
+
+    resourceGenerators in Compile <+= (resourceManaged in Compile, name, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams) map buildFile
   )
 
-  def buildFile(outDir: File, name: String, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams, props: Properties) = {
-    s.log.info("Known properties: %s" format props.toMap.toString())
+  def buildFile(outDir: File, name: String, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams) = {
+    val propertiesList = List("build.number",
+      "teamcity.build.branch",
+      "build.vcs.number",
+      "vcsroot.url",
+      "teamcity.version",
+      "teamcity.projectName",
+      "teamcity.buildConfName")
 
-    val versionInfo = Map(
+    val propertiesMap = propertiesList.map{propName =>
+      propName -> System.getProperty("Property %s" format propName, "<%s not set>" format propName)
+    }
+
+    val versionInfo = propertiesMap ++ Map(
       "Revision" -> vcsNum.dequote.trim,
       "Branch" -> branch.dequote.trim,
       "Build" -> buildNum.dequote.trim,
