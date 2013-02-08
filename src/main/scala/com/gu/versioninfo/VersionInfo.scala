@@ -33,6 +33,8 @@ object VersionInfo extends Plugin {
       val tcPropFile = System.getProperty("build.properties.file")
       val tcProperties = new Properties()
       tcProperties.load(new FileInputStream(new File(tcPropFile)))
+      val tcConfigFile = tcProperties.getProperty("teamcity.configuration.properties.file")
+      tcProperties.load(new FileInputStream(new File(tcConfigFile)))
       tcProperties.toMap
     } catch {
       case e:Exception =>
