@@ -25,10 +25,10 @@ object VersionInfo extends Plugin {
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
     vcsUrl := System.getProperty("vcsroot.url", ""),
     properties := System.getProperties,
-    resourceGenerators in Compile <+= (resourceManaged in Compile, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams, properties) map buildFile
+    resourceGenerators in Compile <+= (resourceManaged in Compile, name, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams, properties) map buildFile
   )
 
-  def buildFile(outDir: File, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams, props: Properties) = {
+  def buildFile(outDir: File, name: String, vcsUrl: String, branch: String, vcsNum: String, buildNum: String, s: TaskStreams, props: Properties) = {
     s.log.info("Known properties: %s" format props.toMap.toString())
 
     val versionInfo = Map(
@@ -41,7 +41,7 @@ object VersionInfo extends Plugin {
 
     val versionFileContents = (versionInfo map { case (x, y) => x + ": " + y }).toList.sorted
 
-    val versionFile = outDir / "version.txt"
+    val versionFile = outDir / "versioninfo"/ ("%s.json" format name)
     s.log.debug("Writing to " + versionFile + ":\n   " + versionFileContents.mkString("\n   "))
 
     IO.write(versionFile, versionFileContents mkString "\n")
