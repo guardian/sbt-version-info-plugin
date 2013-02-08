@@ -24,7 +24,7 @@ object VersionInfo extends Plugin {
     vcsBranch := System.getProperty("teamcity.build.branch", "DEV"),
     vcsNumber := System.getProperty("build.vcs.number", "DEV"),
     vcsUrl := System.getProperty("vcsroot.url", ""),
-    properties := System.getProperties
+    properties := System.getProperties,
     resourceGenerators in Compile <+= (resourceManaged in Compile, vcsUrl, vcsBranch, vcsNumber, buildNumber, streams, properties) map buildFile
   )
 
