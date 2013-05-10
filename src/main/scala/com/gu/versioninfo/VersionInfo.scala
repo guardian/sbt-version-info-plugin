@@ -15,7 +15,7 @@ object VersionInfo extends Plugin {
   val DEV = "DEV"
 
   implicit def string2Dequote(s: String) = new {
-    lazy val dequote = s.replace("\"", "")
+    lazy val dequote = s.replace("\"", "").replaceAll("""\\/""", "/")
   }
 
   def getSystemProperty(key: String): Option[String] = {
@@ -50,7 +50,7 @@ object VersionInfo extends Plugin {
           s.log.info("Couldn't read TeamCity configuration properties file from %s" format tcConfigFile)
           None
         }
-    }.getOrElse(Map.empty)
+    }.getOrElse(Map.empty).mapValues(_.dequote)
   }
 
   val teamcityBuildPropertiesFile = SettingKey[Option[File]]("teamcity-build-properties-file")
@@ -98,30 +98,47 @@ object VersionInfo extends Plugin {
 
   def buildJson(outDir: File, tcProps:Map[String,String], projectName: String, description: String, s: TaskStreams) = {
 
-    val ciMap = Map(
-      "built-by" -> None,
-      "built-on" -> None,
+    def jsonMap(input:Map[String, Any]) = {
+      JSONObject(input.filter(_._2 != None).mapValues{
+        case Some(value) => value
+        case other => other
+      })
+    }
+
+    val ciJson = jsonMap(Map(
+      "provider" -> "teamcity",
+      "built-by" -> System.getProperty("user.name", "<unknown>"),
+      "built-on" -> InetAddress.getLocalHost.getHostName,
       "build-jdk" -> None,
-      "build-id" -> None,
-      "build-number" -> None,
+      "build-id" -> tcProps.get("teamcity.build.id"),
+      "build-number" -> tcProps.get("build.number"),
       "name" -> None,
-      "project" -> None,
-      "configuration" -> None
-    )
-    val vcsMap = Map(
-      "type" -> "git",
-      "revision" -> None,
-      "branch" -> None,
-      "url" -> None
-    )
-    val projectMap = Map(
+      "project" -> tcProps.get("teamcity.projectName"),
+      "configuration" -> tcProps.get("teamcity.buildConfName"),
+      "url" -> {
+        val serverUrl = tcProps.get("teamcity.serverUrl")
+        val buildId = tcProps.get("teamcity.build.id")
+        if (serverUrl.isDefined && buildId.isDefined) {
+          Some("%s/viewLog.html?buildId=%s" format (serverUrl.get,buildId.get))
+        } else None
+      }
+    ))
+    val vcsJson = jsonMap(Map(
+      "provider" -> "git",
+      "revision" -> tcProps.get("build.vcs.number"),
+      "branch" -> tcProps.get("teamcity.build.branch"),
+      "url" -> tcProps.get("vcsroot.url")
+    ))
+    val projectJson = jsonMap(Map(
       "label" -> "",
       "description" -> description,
-      "ci" -> ciMap,
-      "vcs" -> vcsMap
-    )
+      "ci" -> ciJson,
+      "vcs" -> vcsJson,
+      "date" -> new Date().getTime,
+      "human-readable-date" -> new Date().toString
+    ))
 
-    val json = JSONObject(Map(projectName -> projectMap))
+    val json = jsonMap(Map(projectName -> projectJson))
     val jsonContent = json.toString()
 
     val versionJsonFile = outDir / ("%s.version.json" format projectName)
