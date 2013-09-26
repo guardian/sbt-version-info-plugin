@@ -10,3 +10,6 @@ publishTo := Some(Resolver.url("scala-sbt-plugin-releases", new URL("http://repo
 
 publishMavenStyle := false
 
+crossBuildingSettings
+
+CrossBuilding.crossSbtVersions := Seq("0.12", "0.13")
