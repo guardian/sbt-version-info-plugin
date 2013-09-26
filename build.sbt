@@ -19,4 +19,4 @@ publishMavenStyle := false
 
 crossBuildingSettings
 
-CrossBuilding.crossSbtVersions := Seq("0.12", "0.13.0")
+CrossBuilding.crossSbtVersions := Seq("0.12", "0.13")
